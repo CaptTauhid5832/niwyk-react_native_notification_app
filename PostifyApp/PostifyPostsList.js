@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { Ionicons } from '@expo/vector-icons';
-import { ScrollView } from 'react-native-web';
+import { ScrollView } from 'react-native';
 
 const PostifyPostsList = ({route}) => {
   let poster  = auth.currentUser.email;
