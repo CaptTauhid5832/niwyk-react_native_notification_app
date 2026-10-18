@@ -16,7 +16,8 @@ const LoginScreen = () => {
     } catch(error) {
         const errorMessage = error.message;
         console.log(errorMessage);
-        Alert.alert("Login Error", "Please check the credentials");
+        // Alert.alert does nothing on web, so use alert() to show the error everywhere
+        alert("Login Error: " + errorMessage);
     };
   };
 
