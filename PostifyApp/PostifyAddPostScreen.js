@@ -3,6 +3,7 @@ import { View, Text, TextInput, Pressable, Image, StyleSheet, Alert } from 'reac
 import { db, auth } from './firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function PostifyAddPostScreen() {
   const [title, setTitle] = useState('');
@@ -16,8 +17,7 @@ export default function PostifyAddPostScreen() {
       const randomId = Math.floor(Math.random() * 1000000).toString();
       // Construct the data object conditionally
       const postData = {};
-      postData:id = randomId;
-      // postData:_id = randomId;
+      postData.id = randomId;
       postData.title = title;
       postData.createdAt = Timestamp.now();
       if (textNote) postData.text = textNote;
@@ -27,16 +27,55 @@ export default function PostifyAddPostScreen() {
 
       navigation.navigate('PostifyPostsList', { poster: auth.currentUser.email})
       addDoc(collection(db, "postify_posts"), postData).then(()=>{
-        alert('Uplaoded Successfully!')// In real apps, replace this with expo-notifications 
+        alert('Uploaded Successfully!')// In real apps, replace this with expo-notifications 
       })
     } else {
       alert("Please fill all required fields");
     }
   };
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 0.5,
+    });
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
   return (
-    //Add a View to accept title, multi-line text
-    //Audio file and image as input
+    <View style={styles.container}>
+      <Text style={styles.label}>Title</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter a title"
+        value={title}
+        onChangeText={setTitle}
+      />
+      <Text style={styles.label}>Post</Text>
+      <TextInput
+        style={styles.textArea}
+        placeholder="What's on your mind?"
+        value={textNote}
+        onChangeText={setTextNote}
+        multiline
+      />
+      <View style={styles.postOptions}>
+        <Pressable style={styles.button} onPress={pickImage}>
+          <Text style={styles.buttonText}>Pick an image</Text>
+        </Pressable>
+        {imageUri ? <Image source={{ uri: imageUri }} style={styles.image} /> : null}
+      </View>
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={() => handleSubmit(false)}>
+          <Text style={styles.buttonText}>Post</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => handleSubmit(true)}>
+          <Text style={styles.buttonText}>Private Post</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }
 

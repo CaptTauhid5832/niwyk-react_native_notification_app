@@ -1,4 +1,8 @@
-//Add all the relevant imports 
+import React, { useState } from 'react';
+import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { getFirestore, collection, query, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export const ListUsers = () => {
   const [users, setUsers] = useState([]);
@@ -25,7 +29,7 @@ export const ListUsers = () => {
              const otherUsers = fetchedUsers.filter((user) => user.email !== auth.currentUser.email);
          
              // Set the sorted array with the current user first
-             setUsers([currentUser, ...otherUsers]);        
+             setUsers(currentUser ? [currentUser, ...otherUsers] : otherUsers);        
            } catch (error) {
              console.error('Error fetching users:', error);
            }     
@@ -35,7 +39,24 @@ export const ListUsers = () => {
   );
 
   return (
-	//Add a ScrollView to render the users along with their avatars
+    <ScrollView>
+      {users.map((user) => (
+        <Pressable
+          key={user.id}
+          style={styles.userContainer}
+          onPress={() => navigation.navigate('PostifyPostsList', { poster: user.email })}
+        >
+          <Image
+            source={user.avatar ? { uri: user.avatar } : require('./assets/icon.png')}
+            style={[
+              styles.avatar,
+              user.email === auth.currentUser?.email && styles.currentUserAvatarBorder,
+            ]}
+          />
+          <Text style={styles.username}>{user.displayName || user.display_name || user.email}</Text>
+        </Pressable>
+      ))}
+    </ScrollView>
   );
 };
 
@@ -65,3 +86,5 @@ const styles = StyleSheet.create({
       borderWidth: 3
     }
 	});
+
+export default ListUsers;

@@ -1,4 +1,9 @@
-//Add all the relevant imports
+import React, { useState } from 'react';
+import { View, TextInput, Image, Pressable, Text, StyleSheet } from 'react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { db, auth } from './firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
@@ -7,8 +12,12 @@ const SignUpScreen = () => {
   const navigation = useNavigation();
 
   const handleSignUp = async () => {
-    if (email && password && confirmPassword && password !== confirmPassword) {
+    if (!email || !password || !confirmPassword) {
       alert("Please provide all required details for SignUp");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
     try {
@@ -34,7 +43,41 @@ const SignUpScreen = () => {
   };
 
   return (
-    //Add the UI that provides for SignUp
+    <View style={styles.container}>
+      <Image source={require('./assets/logo.png')} style={styles.logo} />
+      <Text style={styles.header}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
+      <Pressable style={styles.button} onPress={handleSignUp}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </Pressable>
+      <View style={styles.loginLinkContainer}>
+        <Text>Already have an account? </Text>
+        <Pressable onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.loginLink}>Login</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 };
 

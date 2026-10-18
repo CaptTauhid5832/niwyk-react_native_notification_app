@@ -1,6 +1,10 @@
-//include all the relevant imports
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Image, StyleSheet, Alert, Pressable } from 'react-native';
+import { query, where, setDoc, collection, getDocs, addDoc,doc } from 'firebase/firestore';
+import { auth, db } from './firebase';
+import Toast from "react-native-toast-message";
 
-const SettingsScreen = () => {
+const SettingsScreen = ({ navigation }) => {
   const [avatar, setAvatar] = useState(null);
   const [userEmail, setUserEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -52,7 +56,7 @@ const SettingsScreen = () => {
     if (!docRef) {
       await addDoc(collection(db, "user_data"), {
         email:userEmail,
-        avatar:url,
+        avatar:avatar,
         displayName: displayName
       });
     } else {
@@ -72,7 +76,39 @@ const SettingsScreen = () => {
   }
 
   return (
-    {/*Add the component that is returned here */}
+    <View style={styles.container}>
+      <Text style={styles.title}>Settings</Text>
+      <View style={styles.avatarContainer}>
+        {avatar ? (
+          <Image source={{ uri: avatar }} style={styles.avatar} />
+        ) : (
+          <Text style={styles.avatarPlaceholder}>No Avatar</Text>
+        )}
+      </View>
+      <Text style={styles.label}>{userEmail}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+        <Text style={styles.label}>Avatar URL</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Paste avatar image URL"
+          value={avatar || ''}
+          onChangeText={setAvatar}
+          autoCapitalize="none"
+        />
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+        <Text style={styles.label}>Display Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={userEmail}
+          value={displayName}
+          onChangeText={setDisplayName}
+        />
+      </View>
+      <Pressable style={styles.button} onPress={saveChanges}>
+        <Text style={styles.buttonText}>Save Changes</Text>
+      </Pressable>
+    </View>
   );
 };
 

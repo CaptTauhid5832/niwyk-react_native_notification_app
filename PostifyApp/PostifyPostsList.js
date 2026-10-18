@@ -1,4 +1,16 @@
-//include all the relevant imports here.
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Image, Text, View, FlatList, StyleSheet, Pressable } from 'react-native';
+import {
+  collection,
+  getDocs,
+  where,
+  orderBy,
+  query
+} from 'firebase/firestore';
+import { auth, db } from './firebase';
+import { Ionicons } from '@expo/vector-icons';
+import { ScrollView } from 'react-native-web';
 
 const PostifyPostsList = ({route}) => {
   let poster  = auth.currentUser.email;
@@ -13,8 +25,8 @@ const PostifyPostsList = ({route}) => {
   
     let formatTimestampToDate = (timestamp) => {
         const date = timestamp.toDate();
-        const month = String(date.getMonth()).padStart(2, '0');
-        const day = String(date.getDay()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
         const year = String(date.getFullYear()).padStart(2, '0');
         return `${month}/${day}/${year}`;
       }
@@ -55,7 +67,7 @@ const PostifyPostsList = ({route}) => {
     useFocusEffect(
       useCallback(() => {
         fetchPosts();
-      }, [])
+      }, [poster])
     );
     const listItem = (post)=>{
       return (
@@ -83,7 +95,21 @@ const PostifyPostsList = ({route}) => {
     }
 
   return (
-    //Add a scrollView with all the posts
+    <ScrollView style={styles.container}>
+      {poster == auth.currentUser.email && (
+      <Pressable style={styles.buttonContainer} onPress={()=>loadPostScreen()}><Text style={{color:'white'}}>Add a Post!</Text></Pressable>
+    )}
+
+      {postList && postList.length > 0 ? (
+        <FlatList
+          data={postList}
+          keyExtractor={post => post.id}
+          renderItem={(post)=>listItem(post.item)}
+        />):(
+      // <Text style={{ textAlign: 'center', marginTop: 20 }}>{postList}</Text>
+      <Text style={styles.text}>{postStatus}</Text>
+    )}
+    </ScrollView>
   );
 };
 

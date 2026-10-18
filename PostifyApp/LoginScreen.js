@@ -1,4 +1,8 @@
-//include all the relevant imports here
+import React, { useState } from 'react';
+import { View, TextInput, Image, Pressable, Text, StyleSheet, Alert } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { auth } from './firebase';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -17,7 +21,34 @@ const LoginScreen = () => {
   };
 
   return (
-    //Add the View for the login component
+    <View style={styles.container}>
+      <Image source={require('./assets/logo.png')} style={styles.logo} />
+      <Text style={styles.header}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </Pressable>
+      <View style={styles.signupLinkContainer}>
+        <Text>Don't have an account? </Text>
+        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signupLink}>Sign Up</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 };
 
